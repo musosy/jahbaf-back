@@ -1,0 +1,28 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:12.1
+    container_name: postgres-jahbaf
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env
+    volumes:
+      - ./data/postgres:/postgresql/data
+  back:
+    build: ./
+    container_name: back-jahbaf
+    env_file:
+      - .env
+    ports:
+      - ${BACKEND_PORT}:4000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./:/app
