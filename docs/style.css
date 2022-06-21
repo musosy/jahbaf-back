@@ -1,0 +1,113 @@
+body, h1, p{
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+h1{
+    font-size: 20px;
+}
+
+p{
+    font-size: 14px;
+}
+
+body{
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.side-menu{
+    padding: 20px;
+    box-sizing: border-box;
+    background: #eee;
+    height: 100vh;
+    border-right: 1px solid #00000033;
+}
+.side-menu div{
+    display: flex;
+    flex-direction: column;
+    margin-top: 50px;
+}
+.side-menu div button{
+    margin: 8px 0;
+    cursor: pointer;
+    text-align: left;
+    border: none;
+    text-transform: capitalize;
+}
+.item>div{ width: 100%; }
+
+.content{
+    flex-grow: 1;
+    padding: 6px;
+    box-sizing: border-box;
+    height: 100vh;
+    overflow-y: scroll;
+}
+.item {
+    box-sizing: border-box;
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    background: #00880011;
+    padding: 6px;
+    margin-bottom: 6px;
+    width: 100%;
+    border-radius: 3px;
+}
+.item header {
+    display: flex;
+    align-items: center;
+}
+.item header span {
+    padding: 5px 0;
+    text-align: center;
+    border-radius: 3px;
+    margin: 0 10px 0 0;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 1px;
+    opacity: .9;
+    width: 110px;
+}
+.item header span.query {
+    background: #00008833;
+    border: 1px solid #00008855;
+}
+.item header span.mutation {
+    background: #88000033;
+    border: 1px solid #88000055;
+}
+.item .description{
+    margin: 1.5em 0;
+    font-weight: bold;
+    opacity: .8;
+    letter-spacing: 1px;
+    word-spacing: 3px;
+    font-size: 14px;
+}
+.usage, .returns{
+    background: #333;
+    padding: 10px;
+    border-radius: 3px;
+    color: white;
+    margin-bottom: 1em;
+}
+.exceptions{
+    width: 100%;
+}
+.exceptions .exception{
+    background: #00000011;
+    border-radius: 3px;
+    padding: 20px 10px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 5px;
+}
+.exceptions h3 {
+    color: rgb(171, 10, 42);
+    margin: 0;
+    margin-bottom: 1em;
+}

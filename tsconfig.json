@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "lib": ["es2020"],
+        "sourceMap": true,
+        "module": "commonjs",
+        "rootDir": "src",
+        "resolveJsonModule": true,
+        "allowJs": true,
+        "outDir": "build",
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "baseUrl": ".",
+        "noImplicitAny": true,
+        "skipLibCheck": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+    },
+    "exclude": ["docs", "coverage", "config"]
+}

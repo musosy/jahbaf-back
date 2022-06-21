@@ -1,0 +1,9 @@
+/node_modules
+/docs
+.prettier*
+.eslint*
+README.md
+.gitignore
+.git
+.env
+docker-compose.yaml

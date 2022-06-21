@@ -1,0 +1,13 @@
+name: pr-tests
+
+on:
+  pull_request
+
+jobs:
+  pr-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Run backend tests
+        run: yarn install && yarn run test
