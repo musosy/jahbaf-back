@@ -4,10 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start:docker": "typeorm migration:run && ts-node-dev -r dotven/config --no-notify --respawn --exit-child -r tsconfig-paths/register --transpile-only src/server",
-    "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
-    "migration:generate": "yarn run typeorm migration:generate -n",
-    "migration:run": "yarn run typeorm migration:run",
+    "start:docker": "npx prisma db push && ts-node-dev -r dotenv/config --no-notify --respawn --exit-child -r tsconfig-paths/register --transpile-only src/server",
+    "start:prod": "docker compose up --build",
+    "start": "ts-node-dev -r dotenv/config --no-notify --respawn --exit-child -r tsconfig-paths/register --transpile-only src/server",
+    "prisma:format": "npx prisma format",
+    "prisma:migrate": "npx prisma migrate dev",
     "lint": "lint-staged"
   },
   "repository": {
@@ -22,6 +23,7 @@
   },
   "homepage": "https://github.com/musosy/jahbaf-back#readme",
   "dependencies": {
+    "@prisma/client": "^3.15.2",
     "bcryptjs": "^2.4.3",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
@@ -39,9 +41,16 @@
     "eslint": "^8.18.0",
     "lint-staged": "^13.0.2",
     "prettier": "^2.7.1",
+    "prisma": "^3.15.2",
     "ts-node": "^10.8.1",
     "ts-node-dev": "^2.0.0",
     "tsconfig-paths": "^4.0.0",
     "typescript": "^4.7.4"
+  },
+  "lint-staged": {
+    "src/**/*.{ts,tsx}": [
+      "./node_modules/.bin/eslint --max-warnings=0 --fix",
+      "pretty-quick"
+    ]
   }
 }
