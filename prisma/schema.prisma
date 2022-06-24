@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "darwin-arm64"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id            Int            @id @default(autoincrement())
+  name          String
+  project_users Project_User[]
+}
+
+model Project {
+  id            String         @id @default(uuid())
+  name          String
+  created_at    DateTime       @default(now())
+  updated_at    DateTime       @default(now())
+  Sprint        Sprint[]
+  tasks         Task[]
+  project_users Project_User[]
+}
+
+model User {
+  id            String         @id @default(uuid())
+  name          String
+  email         String         @unique
+  password      String
+  activated     Boolean        @default(false)
+  updated_at    DateTime       @default(now())
+  created_at    DateTime       @default(now())
+  tasks         Task[]
+  project_users Project_User[]
+}
+
+model Project_User {
+  id         Int     @id @default(autoincrement())
+  project    Project @relation(fields: [project_id], references: [id])
+  user       User    @relation(fields: [user_id], references: [id])
+  roles      Role    @relation(fields: [role_id], references: [id])
+  role_id    Int
+  project_id String
+  user_id    String
+}
+
+model Sprint {
+  id          String   @id @default(uuid())
+  start_date  DateTime
+  end_date    DateTime
+  description String
+  projet      Project  @relation(fields: [project_id], references: [id])
+  project_id  String
+  tasks       Task[]
+}
+
+model Status {
+  id    String @id @default(uuid())
+  name  String
+  tasks Task[]
+}
+
+model Task {
+  id          String   @id @default(uuid())
+  status      Status   @relation(fields: [status_id], references: [id])
+  sprint      Sprint   @relation(fields: [sprint_id], references: [id])
+  created_at  DateTime @default(now())
+  status_id   String
+  sprint_id   String
+  project     Project  @relation(fields: [project_id], references: [id])
+  assignee    User     @relation(fields: [user_id], references: [id])
+  title       String
+  points      Int
+  priority    String
+  description String
+  project_id  String
+  user_id     String
+}
