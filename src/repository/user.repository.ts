@@ -16,5 +16,16 @@ export const UserRepository = {
                 email: true,
             }
         })
+    },
+    findOneByEmail: async (email: string): Promise<any> => {
+        return await prisma.user.findUnique({
+            where: {
+                email: email
+            },
+            select: {
+                email: true,
+                password: true,
+            }
+        })
     }
 }
