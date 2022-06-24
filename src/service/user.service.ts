@@ -13,5 +13,11 @@ export const UserService = {
     },
     getOneByEmail: async (email: string): Promise<any> => {
         return await UserRepository.findOneByEmail(email);
+    },
+    activateAccount: async (id: string): Promise<User> => {
+        return await UserRepository.activateAccount(id);
+    },
+    deleteOneById: async (id: string): Promise<any> => {
+        return await UserRepository.delete(id);
     }
 }

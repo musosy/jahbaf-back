@@ -13,8 +13,10 @@ export const UserRepository = {
                 id: id
             },
             select: {
+                id: true,
                 name: true,
                 email: true,
+                password: true,
             }
         })
     },
@@ -24,12 +26,15 @@ export const UserRepository = {
                 email: email
             },
             select: {
+                id: true,
+                name: true,
                 email: true,
                 password: true,
+                activated: true,
             }
         })
     },
-    create: async ({name, email, password}: UserNew): Promise<any> => {
+    create: async ({ name, email, password }: UserNew): Promise<any> => {
         return await prisma.user.create({
             data: {
                 name,
@@ -37,5 +42,22 @@ export const UserRepository = {
                 password
             }
         });
+    },
+    activateAccount: async (id: string): Promise<User> => {
+        return await prisma.user.update({
+            where: {
+                id: id
+            },
+            data: {
+                activated: true
+            }
+        })
+    },
+    delete: async (id: string): Promise<any> => {
+        return await prisma.user.delete({
+            where: {
+                id
+            }
+        })
     }
 }
