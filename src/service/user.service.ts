@@ -19,5 +19,8 @@ export const UserService = {
     },
     deleteOneById: async (id: string): Promise<any> => {
         return await UserRepository.delete(id);
+    },
+    resetPassword: async(id: string, password: string): Promise<any> => {
+        return await UserRepository.resetPassword(id, password);
     }
 }

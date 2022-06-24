@@ -84,7 +84,32 @@ export const AuthService = {
 
         return token;
     },
-    resetPassword: async () => {
-
+    resetPasswordMail: async (email: string) => {
+        const user = await UserService.getOneByEmail(email);
+        if (!user) return { status: 400, message: "User not found" };
+        const token = AuthUtils.createToken(user.id);
+        try {
+            await MailService.sendResetPasswordEmail(email, MailService.createMailingURL(token, "reset-password"));
+        } catch(e: any) {
+            return { status: e.code, message: e.response.body.errors[0].message}
+        }
+        return { status: 200, message: "Email sent" };
     },
+    resetPassword: async (token: string, password: string): Promise<string> => {
+        try {
+            const { userId, expiresIn, emittedAt } = AuthUtils.getTokenPayload(token);
+            console.log({ userId, expiresIn, emittedAt })
+            const isExpired = AuthUtils.isTokenExpired(expiresIn, emittedAt);
+            if (isExpired) throw new Error('Token expired');
+            const user = await UserService.getOneById(userId);
+            if (!user) throw new Error('User could not be found');
+            const hashedPassword = AuthHelper.hash(password);
+            const updatedUser = await UserService.resetPassword(userId, hashedPassword);
+            if(!updatedUser) throw new Error('User could not be updated');
+            return token;
+        } catch(e) {
+            console.log(e);
+            return "Something went wrong"
+        }
+    }
 }
