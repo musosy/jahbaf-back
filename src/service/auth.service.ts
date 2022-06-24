@@ -36,9 +36,10 @@ export const AuthService = {
         if (!userData.activated) return { status: 403, message: "User is not activated" };
 
         const payload = `${userData.id}`;
+        const token = AuthUtils.createToken(payload);
         return {
           expires_in: 3600,
-          access_token: JwtService.sign(payload),
+          access_token: token,
           user_id: payload,
           status: 200,
         };
@@ -49,6 +50,7 @@ export const AuthService = {
     autoLogin: async (token: string): Promise<any> => {
 
         const isTokenValid = AuthUtils.getTokenPayload(token.split(' ')[1]);
+
         if (!isTokenValid) return { status: 404 };
         const { userId, expiresIn, emittedAt } = isTokenValid;
 
