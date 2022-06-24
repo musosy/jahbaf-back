@@ -1,16 +1,15 @@
 import { Router } from 'express';
 import { UserService } from 'src/service';
+import { JwtStragy } from 'src/middleware/authguard/jwtstrategy';
 
 const UserController: Router = Router();
 
-UserController.get('/', async (req, res) => {
-    const response = await UserService.getAll();
-    res.json(response);
+UserController.get('/', async (_req, res) => {
+    res.json(await UserService.getAll());
 })
 
 UserController.get('/:id', async (req, res) => {
-    const response = await UserService.getOneById(req.params.id);
-    res.json(response);
+    res.json(await UserService.getOneById(req.params.id));
 })
 
 export { UserController };

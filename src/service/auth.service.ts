@@ -2,13 +2,12 @@ import { UserLogin, UserNew } from "src/interface";
 import { JwtService } from "src/middleware/authguard/jwtservice";
 import * as crypto from 'crypto';
 import { UserService } from "./user.service";
-import { JwtPayload } from "jsonwebtoken";
 
 export const AuthService = {
     register: async (newUser: UserNew): Promise<any> => {
         newUser.password = AuthService.hash(newUser.password);
         const insertedUser = await UserService.insert(newUser);
-        const payload = `${newUser.email}`;
+        const payload = `${insertedUser.email}`;
         return {
             expires_in: 3600,
             access_token: JwtService.sign(payload),

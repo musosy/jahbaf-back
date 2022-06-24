@@ -9,7 +9,7 @@ export const UserService = {
         return "One user: " + id;
     },
     insert: async (newUser: UserNew): Promise<any> => {
-
+        return await UserRepository.create(newUser);
     },
     getOneByEmail: async (email: string): Promise<any> => {
         return await UserRepository.findOneByEmail(email);

@@ -1,4 +1,5 @@
 import { PrismaClient, User } from "@prisma/client"
+import { UserNew } from "src/interface";
 
 const prisma = new PrismaClient();
 
@@ -27,5 +28,14 @@ export const UserRepository = {
                 password: true,
             }
         })
+    },
+    create: async ({name, email, password}: UserNew): Promise<any> => {
+        return await prisma.user.create({
+            data: {
+                name,
+                email,
+                password
+            }
+        });
     }
 }

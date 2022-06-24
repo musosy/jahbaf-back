@@ -6,11 +6,11 @@ export const JwtStragy = async (req: Request, res: Response, next: NextFunction)
     const authHeader: string | undefined = req.headers.authorization;
     if (authHeader) {
         const token: string = authHeader.split(' ')[1];
-        jwt.verify(token, jwtConstants.secret, (err: any, user: any) => {
-            if (err) return res.status(403);
-            req.headers.user = user;
-            next();
+        return jwt.verify(token, jwtConstants.secret, (err: any) => {
+            return err
+                ? res.sendStatus(403)
+                : next();
         });
     }
-    return res.status(401);
+    return res.sendStatus(401);
 }
