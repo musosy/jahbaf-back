@@ -59,5 +59,15 @@ export const UserRepository = {
                 id
             }
         })
+    },
+    resetPassword: async (id: string, password: string): Promise<any> => {
+        return await prisma.user.update({
+            where: {
+                id
+            },
+            data: {
+                password
+            }
+        })
     }
 }

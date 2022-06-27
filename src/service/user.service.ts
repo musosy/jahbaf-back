@@ -6,7 +6,7 @@ export const UserService = {
         return await UserRepository.findAll();
     },
     getOneById: async (id: string): Promise<any> => {
-        return "One user: " + id;
+        return await UserRepository.findOneById(id);
     },
     insert: async (newUser: UserNew): Promise<any> => {
         return await UserRepository.create(newUser);
@@ -19,5 +19,8 @@ export const UserService = {
     },
     deleteOneById: async (id: string): Promise<any> => {
         return await UserRepository.delete(id);
+    },
+    resetPassword: async(id: string, password: string): Promise<any> => {
+        return await UserRepository.resetPassword(id, password);
     }
 }
