@@ -17,72 +17,80 @@ export const AuthService = {
         const insertedUser = await UserService.insert(newUser);
         const payload = `${insertedUser.id}`;
         const token = AuthUtils.createToken(payload);
-        console.log(token);
-        const mailUrl = MailService.createMailingURL(token, "/confirmEmail");
+        const mailUrl = MailService.createMailingURL(token, "confirm-account");
         try {
             await MailService.sendConfirmationEmail(insertedUser.email, mailUrl);
         } catch (e: any) {
             await UserService.deleteOneById(insertedUser.id);
             return { status: e.code, message: e.response.body.errors[0].message };
         }
-
         return { status: 201, message: "Confirmation mail sent to " + insertedUser.email };
     },
     login: async (user: UserLogin): Promise<any> => {
-
-        const userData = await AuthHelper.validate(AuthHelper.formatEmail(user.email));
-        if (!userData || userData.password != AuthHelper.hash(user.password)) return { status: 404 };
-
-        if (!userData.activated) return { status: 403, message: "User is not activated" };
-
-        const payload = `${userData.id}`;
-        const token = AuthUtils.createToken(payload);
-        return {
-          expires_in: 3600,
-          access_token: token,
-          user_id: payload,
-          status: 200,
-        };
+        try {
+            const userData = await AuthHelper.validate(AuthHelper.formatEmail(user.email));
+            if (!userData || userData.password != AuthHelper.hash(user.password)) return { status: 404, message: "Incorrect password" };
+            if (!userData.activated) return { status: 403, message: "User is not activated" };
+            const payload = `${userData.id}`;
+            const token = AuthUtils.createToken(payload);
+            return {
+                expires_in: 3600,
+                access_token: token,
+                user_id: payload,
+                status: 200,
+            };
+        } catch(e: any) {
+            return { status: 404, message: e.toString() };
+        }
     },
     logout: async (): Promise<any> => {
         // undefined
     },
     autoLogin: async (token: string): Promise<any> => {
+        try {
+            const isTokenValid = AuthUtils.getTokenPayload(token.split(' ')[1]) ?? "";
+            if (!isTokenValid) return { status: 404 };
+            const { userId, expiresIn, emittedAt } = isTokenValid;
 
-        const isTokenValid = AuthUtils.getTokenPayload(token.split(' ')[1]);
+            const isExpired = AuthUtils.isTokenExpired(expiresIn, emittedAt);
+            if (isExpired) throw new Error('Token expired');
 
-        if (!isTokenValid) return { status: 404 };
-        const { userId, expiresIn, emittedAt } = isTokenValid;
+            const user = await UserService.getOneById(userId);
+            if (!user) return { status: 404, message: "User not found" };
 
-        const isExpired = AuthUtils.isTokenExpired(expiresIn, emittedAt);
-        if (isExpired) throw new Error('Token expired');
+            const payload = `${user.id}`;
+            const newToken = AuthUtils.createToken(payload);
 
-        const user = await UserService.getOneById(userId);
-        if (!user) return { status: 404, message: "User not found" };
-
-        const payload = `${user.id}`;
-        const newToken = AuthUtils.createToken(payload);
-
-        return {
-            expires_in: 3600,
-            access_token: newToken,
-            user_id: payload,
-            status: 200,
-        };
+            return {
+                expires_in: 3600,
+                access_token: newToken,
+                user_id: payload,
+                user: { ...user },
+                status: 200,
+            };
+        } catch(e: any) {
+            return { status: 404, message: e.toString() }
+        }
     },
-    confirmAccount: async (token: string): Promise<string> => {
-        const { userId, expiresIn, emittedAt } = AuthUtils.getTokenPayload(token);
-
-        const isExpired = AuthUtils.isTokenExpired(expiresIn, emittedAt);
-        if (isExpired) throw new Error('Token expired');
-
-        const user = await UserService.getOneById(userId);
-        if (!user) throw new Error('User could not be found');
-
-        const updatedUser = await UserService.activateAccount(userId);
-        if(!updatedUser) throw new Error('User could not be updated');
-
-        return token;
+    confirmAccount: async (token: string): Promise<any> => {
+        try {
+            const { userId, expiresIn, emittedAt } = AuthUtils.getTokenPayload(token);
+            const isExpired = AuthUtils.isTokenExpired(expiresIn, emittedAt);
+            if (isExpired) throw new Error('Token expired');
+            const user = await UserService.getOneById(userId);
+            if (!user) throw new Error('User could not be found');
+            const updatedUser = await UserService.activateAccount(userId);
+            if(!updatedUser) throw new Error('User could not be updated');
+            return {
+                expires_in: 3600,
+                access_token: token,
+                user_id: userId,
+                user: { ...user },
+                status: 200,
+            };
+        } catch (e: any) {
+            return { status: 403, message: e.message }
+        }
     },
     resetPasswordMail: async (email: string) => {
         const user = await UserService.getOneByEmail(email);
@@ -90,15 +98,14 @@ export const AuthService = {
         const token = AuthUtils.createToken(user.id);
         try {
             await MailService.sendResetPasswordEmail(email, MailService.createMailingURL(token, "reset-password"));
+            return { status: 200, message: "Email sent" };
         } catch(e: any) {
             return { status: e.code, message: e.response.body.errors[0].message}
         }
-        return { status: 200, message: "Email sent" };
     },
-    resetPassword: async (token: string, password: string): Promise<string> => {
+    resetPassword: async (token: string, password: string): Promise<any> => {
         try {
             const { userId, expiresIn, emittedAt } = AuthUtils.getTokenPayload(token);
-            console.log({ userId, expiresIn, emittedAt })
             const isExpired = AuthUtils.isTokenExpired(expiresIn, emittedAt);
             if (isExpired) throw new Error('Token expired');
             const user = await UserService.getOneById(userId);
@@ -106,10 +113,15 @@ export const AuthService = {
             const hashedPassword = AuthHelper.hash(password);
             const updatedUser = await UserService.resetPassword(userId, hashedPassword);
             if(!updatedUser) throw new Error('User could not be updated');
-            return token;
-        } catch(e) {
-            console.log(e);
-            return "Something went wrong"
+            return {
+                expires_in: 3600,
+                access_token: token,
+                user_id: userId,
+                user: { ...user },
+                status: 200,
+            };
+        } catch(e: any) {
+            return { status: 404, message: e.message }
         }
     }
 }

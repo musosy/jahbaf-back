@@ -17,6 +17,7 @@ export const UserRepository = {
                 name: true,
                 email: true,
                 password: true,
+                activated: true,
             }
         })
     },

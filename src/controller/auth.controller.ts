@@ -28,7 +28,8 @@ AuthController.get('/confirm-account/:token', async (req: Request, res: Response
 AuthController.post('/reset-password-mail', async (req: Request, res: Response) => {
     res.json(await AuthService.resetPasswordMail(req.body.email));
 })
-AuthController.post('/reset-password', async (req: Request, res: Response) => {
+
+AuthController.post('/reset-password/', async (req: Request, res: Response) => {
     res.json(await AuthService.resetPassword(req.body.data.token, req.body.data.password));
 })
 
