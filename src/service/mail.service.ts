@@ -3,7 +3,6 @@ import sgMail from '@sendgrid/mail';
 export const MailService = {
     sendConfirmationEmail: async (email: string, confirmationUrl: string): Promise<void> => {
         sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
-        console.log(email);
         const message = {
             to: email,
             from: process.env.SENDGRID_FROM_EMAIL || '',
@@ -39,7 +38,7 @@ export const MailService = {
         await sgMail.send(message);
     },
     createMailingURL: (token: string, route: string): string => {
-        return `${process.env.FRONTEND_URL}${route}?token=${token}`;
+        return `${process.env.FRONTEND_URL}${route}/${token}`;
     }
 }
 
